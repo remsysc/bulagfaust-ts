@@ -1,0 +1,22 @@
+# docker-compose.yml
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: bulagfaust-node-postgres
+    environment:
+      POSTGRES_DB: bulagfaust_node
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - db-network
+
+volumes:
+  pgdata:
+
+networks:
+  db-network:
+    driver: bridge

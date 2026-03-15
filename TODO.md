@@ -178,7 +178,7 @@ you build will rely on it.
   - [x] Handle 404 unknown routes: `app.use((req, res) => ...)`
   - [x] Handle unknown 500 errors: log stack trace, return generic message
 
-- [ ] Wire error handler as **last middleware** in `app.ts`
+- [x] Wire error handler as **last middleware** in `app.ts`
 
 **✅ Done when:** All errors return this consistent shape:
 ```json
@@ -203,15 +203,15 @@ you build will rely on it.
 > gives you that data, and at what point in the login flow do you call it?
 
 ### 5.1 — Auth Service
-- [ ] Create `src/services/auth.service.ts`
-  - [ ] `register(data: RegisterCredentials): Promise<string>` (returns JWT)
+- [x] Create `src/services/auth.service.ts`
+  - [x] `register(data: RegisterCredentials): Promise<string>` (returns JWT)
     1. Check if email already exists → throw `ConflictException`
     2. Check if username already exists → throw `ConflictException`
     3. `createUser(data)` — password hashing is in the repository
     4. Fetch `ROLE_USER` by name
     5. `assignRoleToUser(newUser.id, role.id)`
     6. Return signed JWT with `{ userId, email, roles: ['ROLE_USER'] }`
-  - [ ] `login(data: AuthCredentials): Promise<string>` (returns JWT)
+  - [x] `login(data: AuthCredentials): Promise<string>` (returns JWT)
     1. `findByEmail(email)` → not found → throw `UnauthorizedException`
     2. `bcrypt.compare(password, user.password)` → mismatch → throw `UnauthorizedException`
     3. `findUserRoles(user.id)` → map to `string[]`
@@ -474,43 +474,5 @@ your auth middleware or repository has a bug — better to find it here than in 
 
 ---
 
-## 🦆 Rubber Duck Debugging
 
-> When stuck: Don't Google randomly.
-> Ask: **"How did Spring Boot do this?"** then search **"how to do X in Express"**.
-> You're **translating**, not starting over.
 
----
-
-## 📋 Current Status
-
-| Phase | Status | Notes |
-|-------|--------|-------|
-| Phase 1 - Setup | ✅ Complete | Project skeleton ready |
-| Phase 2 - Database | ✅ Complete | All tables created |
-| Phase 3 - Foundation | ⚠️ Partial | Fix typos + add `findById` + create `role.repository.ts` |
-| **Phase 4 - Error Handling** | 🔲 **NEXT** | Do this BEFORE auth |
-| Phase 5 - Auth | 🔲 Pending | Register + Login + JWT + role assignment |
-| Phase 6 - User Profile | 🔲 Pending | |
-| Phase 7 - Categories | 🔲 Pending | |
-| Phase 8 - Tags | 🔲 Pending | |
-| Phase 9 - Posts | 🔲 Pending | Core feature |
-| Phase 10 - Pagination | 🔲 Pending | |
-| Phase 11 - Polish | 🔲 Pending | |
-
----
-
-## 🚀 Immediate Next Steps
-
-Before starting Phase 4, finish Phase 3:
-
-1. Fix typos in `src/types/entities.ts`:
-   - `categoris` → `categories`
-   - `fist` → `first`
-   - `date?` → `data?` in `ApiResponse`
-
-2. Add `findById` to `src/repositories/user.repository.ts`
-
-3. Create `src/repositories/role.repository.ts` with `findByName`, `findUserRoles`, `assignRoleToUser`
-
-Then: **Phase 4 (Error Handling) → Phase 5 (Auth)**. Don't skip the order. ✨

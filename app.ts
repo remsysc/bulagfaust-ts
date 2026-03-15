@@ -5,6 +5,8 @@ import { RouteNotFoundException } from "./src/errors/RouteNotFoundException";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const secret = process.env.JWT_SECRET;
+if (!secret) throw new Error("JWT_SECRET is not defined");
 
 // Parse incoming JSON bodies
 app.use(express.json());

@@ -1,7 +1,7 @@
 import pool from "../db/";
 import { Role } from "../types/entities";
 
-export const findByName = async (name: string): Promise<Role> => {
+export const findByName = async (name: string): Promise<Role | null> => {
   const result = await pool.query<Role>(
     `SELECT * FROM roles WHERE name = $1 LIMIT 1`,
     [name],
@@ -10,9 +10,7 @@ export const findByName = async (name: string): Promise<Role> => {
   return result.rows[0] ?? null;
 };
 
-export const findByUserRoles = async (
-  userId: string,
-): Promise<Role[] | null> => {
+export const findByUserRoles = async (userId: string): Promise<Role[]> => {
   const result = await pool.query<Role>(
     `SELECT r.id, r.name FROM roles r 
           JOIN user_roles ur ON ur.role_id = r.id 

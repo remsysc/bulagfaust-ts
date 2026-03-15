@@ -1,4 +1,3 @@
-import { UUID } from "crypto";
 import pool from "../db";
 import { User, RegisterCredentials } from "../types/entities";
 import bcrypt from "bcrypt";

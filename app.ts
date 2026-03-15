@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import "./src/db/index";
-import { AppError } from "./src/errors/AppError";
 import { errorHandler } from "./src/middlewares/errorHandler.middleware";
+import { RouteNotFoundException } from "./src/errors/RouteNotFoundException";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,7 +15,7 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const err = new AppError(`Cannot ${req.method} ${req.path}`, 404);
+  const err = new RouteNotFoundException(`Cannot ${req.method} ${req.path}`);
   next(err);
 });
 

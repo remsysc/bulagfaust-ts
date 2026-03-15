@@ -1,7 +1,6 @@
 import pool from "./index";
 
 const createTable = async () => {
-  const client = await pool.connect();
   try {
     await pool.query(
       `CREATE TABLE IF NOT EXISTS users(
@@ -94,8 +93,6 @@ const createTable = async () => {
     console.log("migration complete");
   } catch (err) {
     console.error("migration failed: ", (err as Error).message);
-  } finally {
-    client.release();
   }
 };
 

@@ -24,10 +24,15 @@ import {
 export const register = async (data: RegisterCredentials): Promise<string> => {
   const existingEmail = await findByEmail(data.email);
   if (existingEmail) {
-    throw new ConflictException("User", data.email);
+    throw new ConflictException(
+      "User already exists with this email: " + data.email,
+    );
   }
   const existingUsername = await findByUsername(data.username);
-  if (existingUsername) throw new ConflictException("User", data.username);
+  if (existingUsername)
+    throw new ConflictException(
+      "User already exists with this username: " + data.username,
+    );
 
   const user = await createUser(data);
   const role = await findByName("ROLE_USER");

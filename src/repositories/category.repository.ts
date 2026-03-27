@@ -70,7 +70,7 @@ export const existsByNameExcludeId = async (
 
 export const existsById = async (id: string): Promise<boolean> => {
   const res = await pool.query(
-    `SELECT EXISTS(SELECT 1 FROM categories WHERE name = $1`,
+    `SELECT EXISTS(SELECT 1 FROM categories WHERE id = $1)`,
     [id],
   );
   return res.rows[0].exists;

@@ -313,7 +313,7 @@ declare global {
 ### 8.1 — Repository
 
 - [x] Create `src/repositories/category.repository.ts`
-  - [x]] `findAll(): Promise<Category[]>`
+  - [x] `findAll(): Promise<Category[]>`
   - [x] `findById(id: string): Promise<Category | null>`
   - [x] `create(name: string): Promise<Category>`
   - [x] `update(id: string, name: string): Promise<Category>`
@@ -321,21 +321,21 @@ declare global {
 
 ### 8.2 — Role Middleware
 
-- [ ] Create `src/middlewares/requireRole.middleware.ts`
-  - [ ] Accept a role string (e.g. `'ROLE_ADMIN'`)
-  - [ ] Check `req.user?.roles.includes(role)` → false → throw `ForbiddenException`
+- [x] Create `src/middlewares/requireRole.middleware.ts`
+  - [x] Accept a role string (e.g. `'ROLE_ADMIN'`)
+  - [x] Check `req.user?.roles.includes(role)` → false → throw `ForbiddenException`
 
 ### 8.3 — Service + Controller
 
-- [ ] Create `src/services/category.service.ts`
+- [x] Create `src/services/category.service.ts`
 - [ ] Create `src/controllers/category.controller.ts`
-  - [ ] `GET /api/v1/categories` — public
-  - [ ] `GET /api/v1/categories/:id` — public
-  - [ ] `POST /api/v1/categories` — `requireAuth` + `requireRole('ROLE_ADMIN')`
-  - [ ] `PUT /api/v1/categories/:id` — `requireAuth` + `requireRole('ROLE_ADMIN')`
-  - [ ] `DELETE /api/v1/categories/:id` — `requireAuth` + `requireRole('ROLE_ADMIN')`
-- [ ] Create `src/routes/category.routes.ts`
-- [ ] Wire into `app.ts`
+  - [x] `GET /api/v1/categories` — public
+  - [x] `GET /api/v1/categories/:id` — public
+  - [x] `POST /api/v1/categories` — `requireAuth` + `requireRole('ROLE_ADMIN')`
+  - [x] `PUT /api/v1/categories/:id` — `requireAuth` + `requireRole('ROLE_ADMIN')`
+  - [x] `DELETE /api/v1/categories/:id` — `requireAuth` + `requireRole('ROLE_ADMIN')`
+- [x] Create `src/routes/category.routes.ts`
+- [x] Wire into `app.ts`
 
 **✅ Done when:** Category CRUD works, non-admin write attempts return 403
 

@@ -12,7 +12,7 @@ export const findById = async (id: string): Promise<Category | null> => {
   const result = await pool.query<Category>(
     `SELECT id, name, created_at, updated_at
   FROM  categories
-  WHERE id = $1 LIMIT 1
+  WHERE id = $1
 `,
     [id],
   );
@@ -61,7 +61,7 @@ export const existsByNameExcludeId = async (
   id?: string,
 ): Promise<boolean> => {
   const res = await pool.query(
-    `SELECT EXISTS(SELECT 1 FROM categories WHERE name = $1 AND ($2::uuid IS NULL OR id != $2::uuid))`,
+    `SELECT EXISTS(SELECT 1 FROM categories WHERE name = $1 AND id != $2)`,
     [name, id],
   );
 
@@ -73,5 +73,14 @@ export const existsById = async (id: string): Promise<boolean> => {
     `SELECT EXISTS(SELECT 1 FROM categories WHERE id = $1)`,
     [id],
   );
+  return res.rows[0].exists;
+};
+
+export const existsByName = async (name: string): Promise<boolean> => {
+  const res = await pool.query(
+    `SELECT EXISTS(SELECT 1 FROM categories WHERE name = $1)`,
+    [name],
+  );
+
   return res.rows[0].exists;
 };

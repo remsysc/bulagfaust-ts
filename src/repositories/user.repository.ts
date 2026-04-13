@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 
 export const findByEmail = async (email: string): Promise<User | null> => {
   const result = await pool.query<User>(
-    `SELECT * FROM users WHERE email = $1 LIMIT 1`,
+    `SELECT * FROM users WHERE email = $1`,
     [email],
   );
 
@@ -16,7 +16,7 @@ export const findByUsername = async (
   username: string,
 ): Promise<User | null> => {
   const result = await pool.query<User>(
-    `SELECT * FROM users WHERE username = $1 LIMIT 1`,
+    `SELECT * FROM users WHERE username = $1`,
     [username],
   );
   return result.rows[0] ?? null;

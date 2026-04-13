@@ -64,4 +64,3 @@ export const deleteCategory: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
-

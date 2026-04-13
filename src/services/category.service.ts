@@ -14,7 +14,7 @@ export const findById = async (id: string): Promise<Category> => {
 };
 
 export const createCategory = async (name: string): Promise<Category> => {
-  if (await categoryRepository.existsByNameExcludeId(name)) {
+  if (await categoryRepository.existsByName(name)) {
     throw new ConflictException(name + " category already exists");
   }
   return await categoryRepository.createCategory(name);

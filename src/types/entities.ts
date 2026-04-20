@@ -3,17 +3,16 @@ interface User {
   username: string;
   email: string;
   password: string;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-//generic User Response
 interface UserPublic {
   id: string;
   username: string;
   email: string;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface Role {
@@ -21,7 +20,6 @@ interface Role {
   name: string;
 }
 
-//extended entity for auth
 interface UserWithRoles extends User {
   roles: Role[];
 }
@@ -38,16 +36,16 @@ type PostStatus = "draft" | "published" | "archived";
 
 interface Post {
   id: string;
-  author_id: string;
+  authorId: string;
   title: string;
   content: string;
   status: PostStatus;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
 }
 
-interface PostWithRelations extends Post {
+interface PostWithRelations extends Omit<Post, "authorId"> {
   author: UserPublic;
   categories: Category[];
   tags: Tag[];
@@ -56,14 +54,14 @@ interface PostWithRelations extends Post {
 interface Category {
   id: string;
   name: string;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface Tag {
   id: string;
   name: string;
-  created_at: Date;
+  createdAt: Date;
 }
 
 interface ApiResponse<T> {
@@ -90,6 +88,18 @@ interface Pageable {
     field: string;
     direction: "asc" | "desc";
   };
+}
+
+export interface PostFilters {
+  status?: PostStatus;
+  authorId?: string;
+  categoryId?: string;
+  tagId?: string;
+  search?: string;
+}
+export interface FindAllOptions {
+  filters?: PostFilters;
+  pageable: Pageable;
 }
 
 export type {

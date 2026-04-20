@@ -349,15 +349,15 @@ declare global {
 
 **Dependencies:** Phase 8 pattern established (reuse `requireRole` middleware)
 
-- [ ] Create `src/repositories/tag.repository.ts`
-  - [ ] `findAll()`, `findById()`, `create()`, `deleteById()`
-- [ ] Create `src/services/tag.service.ts`
-- [ ] Create `src/controllers/tag.controller.ts`
-  - [ ] `GET /api/v1/tags` — public
-  - [ ] `POST /api/v1/tags` — `requireAuth`
-  - [ ] `DELETE /api/v1/tags/:id` — `requireAuth`
-- [ ] Create `src/routes/tag.routes.ts`
-- [ ] Wire into `app.ts`
+- [x] Create `src/repositories/tag.repository.ts`
+  - [x] `findAll()`, `findById()`, `create()`, `deleteById()`
+- [x] Create `src/services/tag.service.ts`
+- [x] Create `src/controllers/tag.controller.ts`
+  - [x] `GET /api/v1/tags` — public
+  - [x] `POST /api/v1/tags` — `requireAuth`
+  - [x] `DELETE /api/v1/tags/:id` — `requireAuth`
+- [x] Create `src/routes/tag.routes.ts`
+- [x] Wire into `app.ts`
 
 ---
 
@@ -370,8 +370,11 @@ declare global {
 ### 10.1 — Repository
 
 - [ ] Create `src/repositories/post.repository.ts`
-  - [ ] `findAll(filters: { categoryId?, tagId?, authorId?, status? }): Promise<Post[]>`
-  - [ ] `findById(id: string): Promise<PostWithRelations | null>` — JOIN author, categories, tags
+  - [ ] `findAll(filters: { categoryId?, tagId?, authorId?, status? }): Promise<PageResponse<Post>>`
+  - [ ] `findById(id: string): Promise<Post | null>` — base entity only (relations fetched separately)
+  - [ ] `findByIdWithRelations(id: string): Promise<PostWithRelations | null>` — optional, for display endpoints
+  - [ ] `findCategoriesByPostId(postId: string): Promise<Category[]>`
+  - [ ] `findTagsByPostId(postId: string): Promise<Tag[]>`
   - [ ] `create(data, authorId: string): Promise<Post>`
   - [ ] `update(id: string, data, authorId: string): Promise<Post>` — verify ownership in SQL
   - [ ] `deleteById(id: string, authorId: string): Promise<void>` — verify ownership in SQL

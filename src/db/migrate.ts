@@ -1,105 +1,60 @@
-import pool from "./index";
+import prisma from "./prisma";
 import bcrypt from "bcrypt";
 
-const createTable = async () => {
+const migrate = async () => {
   try {
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS users(
-          id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          username  VARCHAR(255) NOT NULL UNIQUE,
-          email     VARCHAR(255) NOT NULL UNIQUE,
-          password  VARCHAR(255) NOT NULL,
-          created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-          updated_at TIMESTAMP NOT NULL DEFAULT NOW())`,
-    );
-    console.log("users table ready");
+    // Ensure default roles exist
+    await prisma.role.upsert({
+      where: { name: "ROLE_USER" },
+      update: {},
+      create: { name: "ROLE_USER" },
+    });
+    await prisma.role.upsert({
+      where: { name: "ROLE_ADMIN" },
+      update: {},
+      create: { name: "ROLE_ADMIN" },
+    });
+    console.log("roles seeded");
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS roles(
-          id    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          name  VARCHAR(255) NOT NULL UNIQUE)`);
-    console.log("roles table ready");
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS user_roles(
-            user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-            role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
-            PRIMARY KEY(user_id, role_id))`,
-    );
-    console.log("user_roles table ready");
-    await pool.query(`CREATE TABLE IF NOT EXISTS posts(
-              id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-              author_id   UUID REFERENCES users(id) ON DELETE CASCADE,
-              title       VARCHAR(255) NOT NULL,
-              content     TEXT NOT NULL,
-              status      VARCHAR(25) NOT NULL DEFAULT 'draft'
-                          CHECK(status IN ('draft', 'published', 'archived' )),
-              created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-              updated_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-              deleted_at  TIMESTAMP
-      )`);
-    console.log("post table ready");
-
-    await pool.query(`CREATE TABLE IF NOT EXISTS categories(
-          id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          name        VARCHAR(255) NOT NULL UNIQUE,
-          created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-          updated_at  TIMESTAMP NOT NULL DEFAULT NOW()
-    )
-`);
-    console.log("categories table ready");
-
-    await pool.query(`CREATE TABLE IF NOT EXISTS post_categories(
-         post_id UUID REFERENCES posts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-         category_id UUID REFERENCES categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-         PRIMARY KEY(post_id, category_id)
-)`);
-
-    console.log("post_categories table ready");
-
-    await pool.query(`CREATE TABLE IF NOT EXISTS tags(
-          id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          name        VARCHAR(255) NOT NULL UNIQUE,
-          created_at  TIMESTAMP NOT NULL DEFAULT NOW() 
-)`);
-    console.log("tags table ready");
-
-    await pool.query(`CREATE TABLE IF NOT EXISTS post_tags(
-          post_id UUID REFERENCES posts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-          tag_id  UUID REFERENCES tags(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-          PRIMARY KEY(post_id, tag_id)
-)`);
-    console.log("post_tags table ready");
-
-    await pool.query(`INSERT INTO roles(name) VALUES ('ROLE_USER'), ('ROLE_ADMIN')
-                ON CONFLICT (name) DO NOTHING
-
-`);
-    console.log("roles seeeded");
-
+    // Ensure admin user exists
     const hashedPassword = await bcrypt.hash("admin123", 10);
-
-    await pool.query(
-      `INSERT INTO users(username, email, password)
-              VALUES('admin', 'admin@test.com', $1) ON CONFLICT(email) DO NOTHING
-      
-`,
-      [hashedPassword],
-    );
-
+    const admin = await prisma.user.upsert({
+      where: { email: "admin@test.com" },
+      update: {},
+      create: {
+        username: "admin",
+        email: "admin@test.com",
+        password: hashedPassword,
+      },
+    });
     console.log("admin user seeded");
 
-    await pool.query(`INSERT INTO user_roles(user_id, role_id)
-                SELECT u.id, r.id FROM users u, roles r WHERE u.email = 'admin@test.com' 
-                      AND r.name = 'ROLE_ADMIN'
-                    ON CONFLICT(user_id, role_id) DO NOTHING
-
-`);
-    console.log("Admin role assigned");
+    // Assign admin role
+    const adminRole = await prisma.role.findUnique({
+      where: { name: "ROLE_ADMIN" },
+    });
+    if (adminRole) {
+      await prisma.userRole.upsert({
+        where: {
+          userId_roleId: {
+            userId: admin.id,
+            roleId: adminRole.id,
+          },
+        },
+        update: {},
+        create: {
+          userId: admin.id,
+          roleId: adminRole.id,
+        },
+      });
+      console.log("Admin role assigned");
+    }
 
     console.log("migration complete");
   } catch (err) {
-    console.error("migration failed: ", (err as Error).message);
+    console.error("migration failed:", (err as Error).message);
   }
 };
 
-createTable();
+migrate();
+

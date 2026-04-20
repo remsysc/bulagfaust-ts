@@ -8,7 +8,7 @@ export const findAll = async (): Promise<Tag[]> => {
 };
 
 export const findById = async (id: string): Promise<Tag> => {
-  const tag = tagRepository.findById(id);
+  const tag = await tagRepository.findById(id);
   if (!tag) {
     throw new NotFoundException("Tag not found");
   }

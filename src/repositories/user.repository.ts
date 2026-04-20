@@ -1,45 +1,43 @@
-import pool from "../db";
-import { User } from "../types/entities";
-import { RegisterCredentials } from "../validator/auth.validator";
+import prisma from "@/db/prisma";
+import { User, UserPublic } from "@/types/entities";
+import { RegisterCredentials } from "@/validator/auth.validator";
 import bcrypt from "bcrypt";
 
 export const findByEmail = async (email: string): Promise<User | null> => {
-  const result = await pool.query<User>(
-    `SELECT * FROM users WHERE email = $1`,
-    [email],
-  );
-
-  return result.rows[0] ?? null;
+  const user = await prisma.user.findUnique({ where: { email } });
+  return user as User | null;
 };
 
 export const findByUsername = async (
   username: string,
 ): Promise<User | null> => {
-  const result = await pool.query<User>(
-    `SELECT * FROM users WHERE username = $1`,
-    [username],
-  );
-  return result.rows[0] ?? null;
+  const user = await prisma.user.findUnique({ where: { username } });
+  return user as User | null;
 };
 
 export const createUser = async (data: RegisterCredentials): Promise<User> => {
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  const result = await pool.query<User>(
-    `
-        INSERT INTO users(username, email, password)
-        VALUES ($1, $2, $3)
-        RETURNING *
-`,
-    [data.username, data.email, hashedPassword],
-  );
-
-  return result.rows[0];
+  const user = await prisma.user.create({
+    data: {
+      username: data.username,
+      email: data.email,
+      password: hashedPassword,
+    },
+  });
+  return user as User;
 };
 
-export const findById = async (id: string): Promise<User | null> => {
-  const result = await pool.query<User>(
-    `SELECT id, username, email, created_at, updated_at FROM users WHERE id = $1 LIMIT 1`,
-    [id],
-  );
-  return result.rows[0] ?? null;
+export const findById = async (id: string): Promise<UserPublic | null> => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return user as UserPublic | null;
 };
+

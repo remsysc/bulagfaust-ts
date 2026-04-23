@@ -369,14 +369,14 @@ declare global {
 
 ### 10.1 — Repository
 
-- [ ] Create `src/repositories/post.repository.ts`
-  - [ ] `findAll(filters: { categoryId?, tagId?, authorId?, status? }): Promise<PageResponse<Post>>`
-  - [ ] `findById(id: string): Promise<Post | null>` — base entity only (relations fetched separately)
-  - [ ] `findByIdWithRelations(id: string): Promise<PostWithRelations | null>` — optional, for display endpoints
-  - [ ] `findCategoriesByPostId(postId: string): Promise<Category[]>`
-  - [ ] `findTagsByPostId(postId: string): Promise<Tag[]>`
-  - [ ] `create(data, authorId: string): Promise<Post>`
-  - [ ] `update(id: string, data, authorId: string): Promise<Post>` — verify ownership in SQL
+- [x] Create `src/repositories/post.repository.ts`
+  - [x] `findAll(filters: { categoryId?, tagId?, authorId?, status? }): Promise<PageResponse<Post>>`
+  - [x] `findById(id: string): Promise<Post | null>` — base entity only (relations fetched separately)
+  - [x] `findByIdWithRelations(id: string): Promise<PostWithRelations | null>` — optional, for display endpoints
+  - [x] `findCategoriesByPostId(postId: string): Promise<Category[]>`
+  - [x] `findTagsByPostId(postId: string): Promise<Tag[]>`
+  - [x] `create(data, authorId: string): Promise<Post>`
+  - [x] `update(id: string, data, authorId: string): Promise<Post>` — verify ownership in SQL
   - [ ] `deleteById(id: string, authorId: string): Promise<void>` — verify ownership in SQL
   - [ ] `attachCategories(postId: string, categoryIds: string[]): Promise<void>`
   - [ ] `attachTags(postId: string, tagIds: string[]): Promise<void>`

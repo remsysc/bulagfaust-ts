@@ -102,6 +102,22 @@ export interface FindAllOptions {
   pageable: Pageable;
 }
 
+export interface CreatePostInput {
+  title: string;
+  content: string;
+  authorId: string;
+  categoryIds: string[];
+  tagIds: string[];
+}
+
+export interface UpdatePostInput {
+  postId: string;
+  title?: string;
+  content?: string;
+  categoryIds?: string[];
+  tagIds?: string[];
+}
+
 export type {
   User,
   UserPublic,

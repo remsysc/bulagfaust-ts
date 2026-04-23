@@ -37,3 +37,5 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+//TODO: REWRITE ALL SCHEMA VALIDATOR SERVICES to use prisma specific, create a utility helper for try catch for service

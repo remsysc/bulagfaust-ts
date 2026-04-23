@@ -47,7 +47,7 @@ model Post {
   content   String
   status    String    @default("draft")
   createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @map("updated_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
   
   authorId  String    @map("author_id")
@@ -63,7 +63,7 @@ model Category {
   id        String   @id @default(uuid())
   name      String   @unique
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   
   postCategories PostCategory[]
   

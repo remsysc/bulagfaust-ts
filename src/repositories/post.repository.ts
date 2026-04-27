@@ -7,8 +7,8 @@ import {
   Category,
   Tag,
   PostWithRelations,
-  UserPublic,
   CreatePostInput,
+  UpdatePostInput,
 } from "@/types/entities";
 
 const buildPageResponse = <T>(
@@ -87,20 +87,38 @@ export const findById = async (id: string): Promise<Post | null> => {
   const post = await prisma.post.findUnique({
     where: { id: id },
   });
-  return post;
+
+  if (!post) return null;
+
+  return post as Post;
 };
 
 export const findByIdWithRelations = async (
   id: string,
 ): Promise<PostWithRelations | null> => {
   const post = await prisma.post.findFirst({
+    where: { id: id },
     include: {
       author: true,
-      categories: true,
-      tags: true,
+      postCategories: {
+        include: {
+          category: true,
+        },
+      },
+      postTags: {
+        include: {
+          tag: true,
+        },
+      },
     },
   });
-  return post;
+  if (!post) return null;
+
+  return {
+    ...post,
+    categories: post.postCategories.map((pc) => pc.category),
+    tags: post.postTags.map((pc) => pc.tag),
+  } as PostWithRelations;
 };
 
 export const findCategoriesByPostId = async (
@@ -136,7 +154,7 @@ export const findTagsByPostId = async (postId: string): Promise<Tag[]> => {
 export const createPost = async (input: CreatePostInput): Promise<Post> => {
   const { title, content, authorId, categoryIds, tagIds } = input;
 
-  return await prisma.post.create({
+  return (await prisma.post.create({
     data: {
       title,
       content,
@@ -154,13 +172,15 @@ export const createPost = async (input: CreatePostInput): Promise<Post> => {
         })),
       },
     },
-  });
+  })) as Post;
 };
 
-export const updatePost = async (input: UpdatePostInput) => {
+export const updatePost = async (
+  input: UpdatePostInput,
+): Promise<PostWithRelations> => {
   const { postId, title, content, categoryIds, tagIds } = input;
 
-  return await prisma.post.update({
+  const post = await prisma.post.update({
     where: {
       id: postId,
       deletedAt: null,
@@ -168,17 +188,26 @@ export const updatePost = async (input: UpdatePostInput) => {
     data: {
       title,
       content,
-      updatedAt : new Date(); // manually force the refresh
+      updatedAt: new Date(), // manually force the refresh
       postCategories: categoryIds
         ? {
             deleteMany: {}, //wipes the junction table for this post
-            create: categoryIds.map((id) => ({
+            create: categoryIds.map((id: string) => ({
               category: { connect: { id } },
+            })),
+          }
+        : undefined,
+      postTags: tagIds
+        ? {
+            deleteMany: {},
+            create: tagIds.map((id: string) => ({
+              tag: { connect: { id } },
             })),
           }
         : undefined,
     },
     include: {
+      author: true,
       postCategories: {
         include: {
           category: true,
@@ -191,5 +220,46 @@ export const updatePost = async (input: UpdatePostInput) => {
       },
     },
   });
+
+  return {
+    ...post,
+    categories: post.postCategories.map((pc) => pc.category),
+    tags: post.postTags.map((pt) => pt.tag),
+  } as PostWithRelations;
 };
 
+export const deleteById = async (id: string): Promise<void> => {
+  await prisma.post.update({
+    where: { id: id, deletedAt: null },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+  return;
+};
+
+export const attachCategories = async (
+  postId: string,
+  categoryIds: string[],
+): Promise<void> => {
+  if (categoryIds.length === 0) return;
+  await prisma.postCategory.createMany({
+    data: categoryIds.map((categoryId) => ({
+      postId,
+      categoryId,
+    })),
+  });
+};
+
+export const attachTags = async (
+  postId: string,
+  tagIds: string[],
+): Promise<void> => {
+  if (tagIds.length === 0) return;
+  await prisma.postTag.createMany({
+    data: tagIds.map((tagId) => ({
+      postId,
+      tagId,
+    })),
+  });
+};

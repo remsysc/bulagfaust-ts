@@ -51,4 +51,3 @@ export const existsByName = async (name: string): Promise<boolean> => {
   const count = await prisma.category.count({ where: { name } });
   return count > 0;
 };
-

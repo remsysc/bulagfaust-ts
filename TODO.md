@@ -377,7 +377,7 @@ declare global {
   - [x] `findTagsByPostId(postId: string): Promise<Tag[]>`
   - [x] `create(data, authorId: string): Promise<Post>`
   - [x] `update(id: string, data, authorId: string): Promise<Post>` — verify ownership in SQL
-  - [ ] `deleteById(id: string, authorId: string): Promise<void>` — verify ownership in SQL
+  - [x] `deleteById(id: string, authorId: string): Promise<void>` — verify ownership in SQL
   - [ ] `attachCategories(postId: string, categoryIds: string[]): Promise<void>`
   - [ ] `attachTags(postId: string, tagIds: string[]): Promise<void>`
 

@@ -1,4 +1,5 @@
-import { PageResponse } from '@/types/entities';
+import prisma from '@/common/db/prisma';
+import { Post, Category, Tag, Prisma } from '@prisma/client';
 import { CreatePostInput, UpdatePostInput } from './post.schema';
 import {
   FindAllOptions,
@@ -7,9 +8,7 @@ import {
   PostWithRelations,
   postWithRelationsArgs,
 } from './post.types';
-import { Pageable } from '@/types/entities';
-import { Post, Category, Tag } from '@prisma/client';
-import prisma from '@/common/db/prisma';
+import { Pageable, PageResponse } from '@/common/types/entities';
 
 const buildPageResponse = <T>(
   content: T[],
@@ -33,10 +32,8 @@ export const findAll = async ({
   filters,
   pageable,
 }: FindAllOptions): Promise<PageResponse<PostResponseDTO>> => {
-  // 1. Initialize the base where clause
-  const where: Record<string, unknown> = { deletedAt: null };
+  const where: Prisma.PostWhereInput = { deletedAt: null };
 
-  // 2. Conditionally append scalar filters
   if (filters?.status) where.status = filters.status;
   if (filters?.authorId) where.authorId = filters.authorId;
   if (filters?.search) {
@@ -46,7 +43,6 @@ export const findAll = async ({
     ];
   }
 
-  // 3. Conditionally append relation filters directly into the same object
   if (filters?.categoryId) {
     where.postCategories = { some: { categoryId: filters.categoryId } };
   }
@@ -54,7 +50,6 @@ export const findAll = async ({
     where.postTags = { some: { tagId: filters.tagId } };
   }
 
-  // 4. Run exactly ONE Promise.all block with the compiled where clause
   const [posts, total] = await Promise.all([
     prisma.post.findMany({
       where,
@@ -73,41 +68,18 @@ export const findAll = async ({
 };
 
 export const findById = async (id: string): Promise<Post | null> => {
-  const post = await prisma.post.findUnique({
-    where: { id: id },
+  return await prisma.post.findUnique({
+    where: { id, deletedAt: null },
   });
-
-  if (!post) return null;
-
-  return post as Post;
 };
 
 export const findByIdWithRelations = async (
   id: string,
 ): Promise<PostWithRelations | null> => {
-  const post = await prisma.post.findFirst({
-    where: { id: id },
-    include: {
-      author: true,
-      postCategories: {
-        include: {
-          category: true,
-        },
-      },
-      postTags: {
-        include: {
-          tag: true,
-        },
-      },
-    },
+  return await prisma.post.findFirst({
+    where: { id, deletedAt: null },
+    include: postWithRelationsArgs.include,
   });
-  if (!post) return null;
-
-  return {
-    ...post,
-    categories: post.postCategories.map((pc) => pc.category),
-    tags: post.postTags.map((pc) => pc.tag),
-  } as PostWithRelations;
 };
 
 export const findCategoriesByPostId = async (
@@ -117,9 +89,7 @@ export const findCategoriesByPostId = async (
     where: { id: postId },
     include: {
       postCategories: {
-        include: {
-          category: true,
-        },
+        include: { category: true },
       },
     },
   });
@@ -131,13 +101,11 @@ export const findTagsByPostId = async (postId: string): Promise<Tag[]> => {
     where: { id: postId },
     include: {
       postTags: {
-        include: {
-          tag: true,
-        },
+        include: { tag: true },
       },
     },
   });
-  return post?.postTags.map((pc) => pc.tag) ?? [];
+  return post?.postTags.map((pt) => pt.tag) ?? [];
 };
 
 export const createPost = async (
@@ -145,7 +113,7 @@ export const createPost = async (
 ): Promise<Post> => {
   const { title, content, authorId, categoryIds = [], tagIds = [] } = input;
 
-  return (await prisma.post.create({
+  return await prisma.post.create({
     data: {
       title,
       content,
@@ -163,7 +131,7 @@ export const createPost = async (
         })),
       },
     },
-  })) as Post;
+  }); // 👈 Cleared drift: Removed manual 'as Post'
 };
 
 export const updatePost = async (
@@ -181,11 +149,9 @@ export const updatePost = async (
       content,
       postCategories: categoryIds
         ? {
-            deleteMany: {}, //wipes the junction cleanly
+            deleteMany: {},
             create: categoryIds.map((id: string) => ({
-              category: {
-                connect: { id },
-              },
+              category: { connect: { id } },
             })),
           }
         : undefined,
@@ -204,7 +170,7 @@ export const updatePost = async (
 
 export const deleteById = async (id: string): Promise<void> => {
   await prisma.post.update({
-    where: { id: id, deletedAt: null },
+    where: { id, deletedAt: null },
     data: {
       deletedAt: new Date(),
     },

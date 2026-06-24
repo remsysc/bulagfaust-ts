@@ -1,4 +1,3 @@
-import { JWTPayload } from '@/types/entities';
 import { Prisma } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -9,6 +8,7 @@ import { RegisterCredentials, LoginCredentials } from './auth.schema';
 import { UnauthorizedException } from '@/common/errors/UnauthorizedException';
 import { ConflictException } from '@/common/errors/ConflictException';
 import { NotFoundException } from '@/common/errors/NotFoundException';
+import { JWTPayload } from '@/common/types/entities';
 
 export const register = async (data: RegisterCredentials): Promise<string> => {
   const secret = process.env.JWT_SECRET;

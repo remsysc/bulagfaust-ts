@@ -378,8 +378,8 @@ declare global {
   - [x] `create(data, authorId: string): Promise<Post>`
   - [x] `update(id: string, data, authorId: string): Promise<Post>` — verify ownership in SQL
   - [x] `deleteById(id: string, authorId: string): Promise<void>` — verify ownership in SQL
-  - [ ] `attachCategories(postId: string, categoryIds: string[]): Promise<void>`
-  - [ ] `attachTags(postId: string, tagIds: string[]): Promise<void>`
+  - [x] `attachCategories(postId: string, categoryIds: string[]): Promise<void>`
+  - [x] `attachTags(postId: string, tagIds: string[]): Promise<void>`
 
 > **Why verify ownership in SQL?**
 > Service-layer check = 2 queries (fetch post, then check author_id).
@@ -388,13 +388,13 @@ declare global {
 
 ### 10.2 — Service + Controller
 
-- [ ] Create `src/services/post.service.ts`
-- [ ] Create `src/controllers/post.controller.ts`
-  - [ ] `GET /api/v1/posts` — public
-  - [ ] `GET /api/v1/posts/:id` — public (published only, unless owner/admin)
-  - [ ] `POST /api/v1/posts` — `requireAuth`
-  - [ ] `PATCH /api/v1/posts/:id` — `requireAuth` (owner only)
-  - [ ] `DELETE /api/v1/posts/:id` — `requireAuth` (owner only)
+- [x] Create `src/services/post.service.ts`
+- [x] Create `src/controllers/post.controller.ts`
+  - [x] `GET /api/v1/posts` — public
+  - [x] `GET /api/v1/posts/:id` — public (published only, unless owner/admin)
+  - [x] `POST /api/v1/posts` — `requireAuth`
+  - [x] `PATCH /api/v1/posts/:id` — `requireAuth` (owner only)
+  - [x] `DELETE /api/v1/posts/:id` — `requireAuth` (owner only)
 - [ ] Create `src/routes/post.routes.ts`
 - [ ] Wire into `app.ts`
 

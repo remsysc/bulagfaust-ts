@@ -1,14 +1,18 @@
 import * as categoryService from './category.service';
-import { RequestHandler } from 'express';
+import { RequestHandler, Request, Response } from 'express';
 import { UUID } from 'node:crypto';
 
 export const getCategories: RequestHandler = async (
-  req,
-  res,
+  req: Request,
+  res: Response,
   next,
 ): Promise<void> => {
   try {
-    const categories = await categoryService.findAll();
+    if (!req.pageable) {
+      res.status(500).json({ message: 'Pagination middleware missing' });
+      return;
+    }
+    const categories = await categoryService.findAll(req.pageable);
     res.status(200).json({
       categories,
     });

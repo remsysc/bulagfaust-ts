@@ -2,9 +2,12 @@ import { Category } from '@prisma/client';
 import * as categoryRepository from './category.repository';
 import { ConflictException } from '@/common/errors/ConflictException';
 import { NotFoundException } from '@/common/errors/NotFoundException';
+import { Pageable, PageResponse } from '@/common/types/entities';
 
-export const findAll = async (): Promise<Category[]> => {
-  return await categoryRepository.findAll();
+export const findAll = async (
+  pageable: Pageable,
+): Promise<PageResponse<Category>> => {
+  return await categoryRepository.findAll(pageable);
 };
 
 export const findById = async (id: string): Promise<Category> => {

@@ -1,7 +1,7 @@
 import { Request, NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { JWTPayload } from '@/types/entities';
 import { UnauthorizedException } from '../errors/UnauthorizedException';
+import { JWTPayload } from '../types/entities';
 
 export const authenticateToken = (
   req: Request,

@@ -1,35 +1,47 @@
 import prisma from '@/common/db/prisma';
 import { Category } from '@prisma/client';
+import { Pageable, PageResponse } from '@/common/types/entities';
+import { buildPageResponse } from '@/common/utils/pageResponse';
 
-export const findAll = async (): Promise<Category[]> => {
-  const categories = await prisma.category.findMany({ take: 10 });
-  return categories as Category[];
+export const findAll = async (
+  pageable: Pageable,
+): Promise<PageResponse<Category>> => {
+  const [categories, total] = await Promise.all([
+    prisma.category.findMany({
+      skip: (pageable.page - 1) * pageable.size,
+      take: pageable.size,
+      orderBy: {
+        [pageable.sort?.field || 'createdAt']:
+          pageable.sort?.direction || 'desc',
+      },
+    }),
+
+    prisma.category.count(),
+  ]);
+
+  return buildPageResponse(categories, pageable, total);
 };
 
 export const findById = async (id: string): Promise<Category | null> => {
-  const category = await prisma.category.findUnique({ where: { id } });
-  return category as Category | null;
+  return await prisma.category.findUnique({ where: { id } });
 };
 
 export const createCategory = async (name: string): Promise<Category> => {
-  const category = await prisma.category.create({ data: { name } });
-  return category as Category;
+  return await prisma.category.create({ data: { name } });
 };
 
 export const updateCategoryById = async (
   id: string,
   name: string,
 ): Promise<Category | null> => {
-  const category = await prisma.category.update({
+  return await prisma.category.update({
     where: { id },
     data: { name },
   });
-  return category as Category;
 };
 
 export const deleteById = async (id: string): Promise<Category | null> => {
-  const category = await prisma.category.delete({ where: { id } });
-  return category as Category;
+  return await prisma.category.delete({ where: { id } });
 };
 
 export const existsByNameExcludeId = async (

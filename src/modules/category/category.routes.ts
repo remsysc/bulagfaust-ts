@@ -3,10 +3,11 @@ import * as categoryController from './category.controller';
 import { authenticateToken } from '@/common/middlewares/auth.middleware';
 import { requireRole } from '@/common/middlewares/requireRole.middleware';
 import { validate_uuid } from '@/common/middlewares/validator.middleware';
+import { extractPageable } from '@/common/middlewares/pageable.middleware';
 
 const router = Router();
 
-router.get('/', categoryController.getCategories);
+router.get('/', extractPageable(20), categoryController.getCategories);
 router.get('/:categoryId', categoryController.getCategoryById);
 router.post(
   '/',

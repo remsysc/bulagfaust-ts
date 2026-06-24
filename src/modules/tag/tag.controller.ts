@@ -39,7 +39,7 @@ export const deleteById: RequestHandler = async (req, res, next) => {
   try {
     const tagId = req.params.tagId as string;
     await tagService.deleteById(tagId);
-    res.status(204).json({});
+    res.status(204).send();
   } catch (err) {
     next(err);
   }

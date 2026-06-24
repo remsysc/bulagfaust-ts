@@ -1,5 +1,5 @@
+import { Pageable } from '@/common/types/entities';
 import { Prisma, Post as PrismaPost } from '@prisma/client';
-import { Pageable } from '@/types/entities';
 
 export interface PostFilters {
   status?: PrismaPost['status'];

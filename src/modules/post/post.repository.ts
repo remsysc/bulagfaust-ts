@@ -8,25 +8,8 @@ import {
   PostWithRelations,
   postWithRelationsArgs,
 } from './post.types';
-import { Pageable, PageResponse } from '@/common/types/entities';
-
-const buildPageResponse = <T>(
-  content: T[],
-  pageable: Pageable,
-  total: number,
-): PageResponse<T> => {
-  const totalPages = Math.ceil(total / pageable.size);
-  return {
-    content,
-    page: pageable.page,
-    size: pageable.size,
-    totalElements: total,
-    totalPages,
-    last: pageable.page >= totalPages,
-    first: pageable.page === 1,
-    numberOfElements: content.length,
-  };
-};
+import { PageResponse } from '@/common/types/entities';
+import { buildPageResponse } from '@/common/utils/pageResponse';
 
 export const findAll = async ({
   filters,

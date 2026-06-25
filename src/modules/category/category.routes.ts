@@ -2,12 +2,12 @@ import { Router } from 'express';
 import * as categoryController from './category.controller';
 import { authenticateToken } from '@/common/middlewares/auth.middleware';
 import { requireRole } from '@/common/middlewares/requireRole.middleware';
-import { validate_uuid } from '@/common/middlewares/validator.middleware';
-import { extractPageable } from '@/common/middlewares/pageable.middleware';
+import { validate } from '@/common/middlewares/validator.middleware';
+import { paginationSchema, useParamsId } from '@/common/schemas/common.schemas';
 
 const router = Router();
 
-router.get('/', extractPageable(20), categoryController.getCategories);
+router.get('/', validate(paginationSchema), categoryController.getCategories);
 router.get('/:categoryId', categoryController.getCategoryById);
 router.post(
   '/',
@@ -19,14 +19,14 @@ router.put(
   '/:categoryId',
   authenticateToken,
   requireRole('ROLE_ADMIN'),
-  validate_uuid('categoryId'),
+  validate(useParamsId('categoryId')),
   categoryController.updateCategory,
 );
 router.delete(
   '/:categoryId',
   authenticateToken,
   requireRole('ROLE_ADMIN'),
-  validate_uuid('categoryId'),
+  validate(useParamsId('categoryId')),
   categoryController.deleteCategory,
 );
 

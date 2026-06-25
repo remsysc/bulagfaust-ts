@@ -19,9 +19,14 @@ export const authenticateToken = (
   if (!secret) throw new Error('JWT SECRET  is not defined'); //fail fast
 
   jwt.verify(token, secret, (err, decoded) => {
-    if (err)
-      return next(new UnauthorizedException('Invalid or exprired token'));
-    req.user = decoded as JWTPayload;
+    if (err || !decoded)
+      return next(new UnauthorizedException('Invalid or expired token'));
+    const payload = decoded as JWTPayload;
+    req.user = {
+      userId: payload.userId,
+      roles: payload.roles,
+      email: payload.email,
+    };
     next();
   });
 };

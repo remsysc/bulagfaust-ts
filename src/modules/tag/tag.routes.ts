@@ -2,11 +2,12 @@ import { Router } from 'express';
 import * as tagController from './tag.controller';
 import { authenticateToken } from '@/common/middlewares/auth.middleware';
 import { requireRole } from '@/common/middlewares/requireRole.middleware';
-import { validate_uuid } from '@/common/middlewares/validator.middleware';
+import { validate } from '@/common/middlewares/validator.middleware';
+import { paginationSchema, useParamsId } from '@/common/schemas/common.schemas';
 const router = Router();
 
-router.get('/', tagController.getTags);
-router.get('/:tagId', validate_uuid('tagId'), tagController.getTagById);
+router.get('/', validate(paginationSchema), tagController.getTags);
+router.get('/:tagId', validate(useParamsId('tagId')), tagController.getTagById);
 router.post(
   '/',
   authenticateToken,
@@ -16,7 +17,7 @@ router.post(
 router.delete(
   '/:tagId',
   authenticateToken,
-  validate_uuid('tagId'),
+  validate(useParamsId('tagId')),
   tagController.deleteById,
 );
 

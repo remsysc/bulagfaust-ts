@@ -2,9 +2,12 @@ import { Tag } from '@prisma/client';
 import * as tagRepository from './tag.repository';
 import { NotFoundException } from '@/common/errors/NotFoundException';
 import { ConflictException } from '@/common/errors/ConflictException';
+import { Pageable, PageResponse } from '@/common/types/entities';
 
-export const findAll = async (): Promise<Tag[]> => {
-  return await tagRepository.findAll();
+export const findAll = async (
+  pageable: Pageable,
+): Promise<PageResponse<Tag>> => {
+  return await tagRepository.findAll(pageable);
 };
 
 export const findById = async (id: string): Promise<Tag> => {

@@ -1,13 +1,20 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import * as postService from './post.services';
+export const create = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+    const postData = req.body;
+    const newPost = await postService.createPost(postData, req.user.userId);
 
-import * as postRepository from './post.repository';
-
-export const create = async (req: Request, res: Response) => {
-  const authorId = req.user?.userId;
-  const newPost = await postRepository.createPost({
-    ...req.body,
-    authorId,
-  });
-
-  return res.status(201).json(newPost);
+    return res.status(201).json(newPost);
+  } catch (err) {
+    next(err);
+  }
 };

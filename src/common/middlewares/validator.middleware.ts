@@ -2,32 +2,24 @@ import { BadRequestException } from '../errors/BadRequestException';
 import { NextFunction, Request, Response } from 'express';
 import z from 'zod';
 export const validate =
-  (schema: z.ZodObject<any>) =>
+  (schema: z.ZodType<any, any, any>) =>
   (req: Request, res: Response, next: NextFunction) => {
     const parsed = schema.safeParse({
-      ...req.params,
-      ...req.body,
-      ...req.query,
+      params: req.params,
+      body: req.body,
+      query: req.query,
     });
+
     if (!parsed.success) {
       const pretty = z.prettifyError(parsed.error);
       return next(new BadRequestException(pretty));
     }
 
-    req.body = parsed.data;
+    if (parsed.data.params) req.params = parsed.data.params as any;
+    if (parsed.data.body) req.body = parsed.data.body as any;
+    if (parsed.data.query) req.query = parsed.data.query as any;
+    if (parsed.data.pageable) {
+      (req as any).pageable = parsed.data.pageable;
+    }
     next();
   };
-
-export const validate_uuid = (id: string) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const parsed = z.uuid().safeParse(req.params[id]);
-    if (!parsed.success) {
-      const pretty = z.prettifyError(parsed.error);
-      next(new BadRequestException(pretty));
-    } else {
-      next();
-    }
-  };
-};
-
-//TODO: add

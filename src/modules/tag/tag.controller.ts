@@ -1,11 +1,14 @@
 import { RequestHandler } from 'express';
 import * as tagService from './tag.service';
+
 export const getTags: RequestHandler = async (req, res, next) => {
   try {
-    const tags = await tagService.findAll();
-    res.status(200).json({
-      tags,
-    });
+    if (!req.pageable) {
+      res.status(500).json({ message: 'Pagination middleware missing' });
+      return;
+    }
+    const tags = await tagService.findAll(req.pageable);
+    res.status(200).json({ tags });
   } catch (err) {
     next(err);
   }
@@ -13,11 +16,8 @@ export const getTags: RequestHandler = async (req, res, next) => {
 
 export const getTagById: RequestHandler = async (req, res, next) => {
   try {
-    const tagId = req.params.tagId as string;
-    const tag = await tagService.findById(tagId);
-    res.status(200).json({
-      tag,
-    });
+    const tag = await tagService.findById(req.params.tagId as string);
+    res.status(200).json({ tag });
   } catch (err) {
     next(err);
   }
@@ -25,11 +25,8 @@ export const getTagById: RequestHandler = async (req, res, next) => {
 
 export const createTag: RequestHandler = async (req, res, next) => {
   try {
-    const tagName = req.body.name as string;
-    const tag = await tagService.createTag(tagName);
-    res.status(201).json({
-      tag,
-    });
+    const tag = await tagService.createTag(req.body.tagName);
+    res.status(201).json({ tag });
   } catch (err) {
     next(err);
   }
@@ -37,8 +34,7 @@ export const createTag: RequestHandler = async (req, res, next) => {
 
 export const deleteById: RequestHandler = async (req, res, next) => {
   try {
-    const tagId = req.params.tagId as string;
-    await tagService.deleteById(tagId);
+    await tagService.deleteById(req.params.tagId as string);
     res.status(204).send();
   } catch (err) {
     next(err);

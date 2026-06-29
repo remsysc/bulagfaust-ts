@@ -3,6 +3,7 @@ import * as tagRepository from './tag.repository';
 import { NotFoundException } from '@/common/errors/NotFoundException';
 import { ConflictException } from '@/common/errors/ConflictException';
 import { Pageable, PageResponse } from '@/common/types/entities';
+import { Prisma } from '@prisma/client';
 
 export const findAll = async (
   pageable: Pageable,
@@ -23,7 +24,16 @@ export const createTag = async (name: string): Promise<Tag> => {
     const tag = await tagRepository.createTag(name);
     return tag;
   } catch (err) {
-    throw new ConflictException(`This tag already exist`);
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      const target = err.meta?.target;
+      if (Array.isArray(target) && target.includes('name')) {
+        throw new ConflictException(`This name is already taken`);
+      }
+    }
+    throw err;
   }
 };
 

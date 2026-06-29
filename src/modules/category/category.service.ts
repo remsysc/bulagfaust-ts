@@ -1,4 +1,4 @@
-import { Category } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 import * as categoryRepository from './category.repository';
 import { ConflictException } from '@/common/errors/ConflictException';
 import { NotFoundException } from '@/common/errors/NotFoundException';
@@ -17,10 +17,21 @@ export const findById = async (id: string): Promise<Category> => {
 };
 
 export const createCategory = async (name: string): Promise<Category> => {
-  if (await categoryRepository.existsByName(name)) {
-    throw new ConflictException(name + ' category already exists');
+  try {
+    const category = categoryRepository.createCategory(name);
+    return category;
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      const target = err.meta?.target;
+      if (Array.isArray(target) && target.includes('name')) {
+        throw new ConflictException('This category name is already taken ');
+      }
+    }
+    throw err;
   }
-  return await categoryRepository.createCategory(name);
 };
 
 export const updateCategoryById = async (

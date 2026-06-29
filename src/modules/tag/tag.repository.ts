@@ -7,7 +7,7 @@ export const findAll = async (
   pageable: Pageable,
 ): Promise<PageResponse<Tag>> => {
   const [tags, total] = await Promise.all([
-    prisma.category.findMany({
+    prisma.tag.findMany({
       skip: (pageable.page - 1) * pageable.size,
       take: pageable.size,
       orderBy: {
@@ -15,7 +15,7 @@ export const findAll = async (
           pageable.sort?.direction || 'desc',
       },
     }),
-    prisma.category.count(),
+    prisma.tag.count(),
   ]);
   return buildPageResponse(tags, pageable, total);
 };

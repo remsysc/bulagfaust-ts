@@ -18,7 +18,7 @@ export const findById = async (id: string): Promise<Category> => {
 
 export const createCategory = async (name: string): Promise<Category> => {
   try {
-    const category = categoryRepository.createCategory(name);
+    const category = await categoryRepository.createCategory(name);
     return category;
   } catch (err) {
     if (
@@ -39,13 +39,9 @@ export const updateCategoryById = async (
   name: string,
 ): Promise<Category> => {
   if (await categoryRepository.existsByNameExcludeId(name, id)) {
-    throw new ConflictException(name + ' category already exists');
+    throw new ConflictException(`${name} category already exists`);
   }
   const category = await categoryRepository.updateCategoryById(id, name);
-  if (!category) {
-    throw new NotFoundException('Category not found');
-  }
-
   return category;
 };
 

@@ -44,9 +44,9 @@ export const paginationSchema = z
   .object({
     query: paginationQuerySchema,
   })
-  .transform((data) => {
-    pageable: transformToPageable(data.query);
-  });
+  .transform((data) => ({
+    pageable: transformToPageable(data.query),
+  }));
 
 export const usePaginatedParams = (paramKey: string) => {
   return z

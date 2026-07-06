@@ -14,6 +14,7 @@ export const register = async (data: RegisterCredentials): Promise<string> => {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error('JWT_SECRET is not defined');
   try {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
     const token = await prisma.$transaction(async (tx) => {
       const role = await tx.role.findFirst({
         where: { name: 'ROLE_USER' },
@@ -21,7 +22,12 @@ export const register = async (data: RegisterCredentials): Promise<string> => {
       if (!role) {
         throw new NotFoundException('ROLE USER is not found');
       }
-      const user = await tx.user.create({ data });
+      const user = await tx.user.create({
+        data: {
+          ...data,
+          password: hashedPassword,
+        },
+      });
       await tx.userRole.create({
         data: {
           userId: user.id,

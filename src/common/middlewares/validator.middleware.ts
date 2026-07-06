@@ -1,6 +1,14 @@
 import { BadRequestException } from '../errors/BadRequestException';
 import { NextFunction, Request, Response } from 'express';
 import z from 'zod';
+
+export const useBody = <T extends z.ZodTypeAny>(schema: T) =>
+  z.object({ body: schema });
+export const useQuery = <T extends z.ZodTypeAny>(schema: T) =>
+  z.object({ query: schema });
+export const useParams = <T extends z.ZodTypeAny>(schema: T) =>
+  z.object({ params: schema });
+
 export const validate =
   (schema: z.ZodType<any, any, any>) =>
   (req: Request, res: Response, next: NextFunction) => {

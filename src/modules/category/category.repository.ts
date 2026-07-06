@@ -33,7 +33,7 @@ export const createCategory = async (name: string): Promise<Category> => {
 export const updateCategoryById = async (
   id: string,
   name: string,
-): Promise<Category | null> => {
+): Promise<Category> => {
   return await prisma.category.update({
     where: { id },
     data: { name },

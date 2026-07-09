@@ -4,6 +4,7 @@ import { NotFoundException } from '@/common/errors/NotFoundException';
 import { ConflictException } from '@/common/errors/ConflictException';
 import { Pageable, PageResponse } from '@/common/types/entities';
 import { Prisma } from '@prisma/client';
+import { isPrismaError } from '@/common/utils/isPrismaError';
 
 export const findAll = async (
   pageable: Pageable,
@@ -12,11 +13,11 @@ export const findAll = async (
 };
 
 export const findById = async (id: string): Promise<Tag> => {
-  const tag = await tagRepository.findById(id);
-  if (!tag) {
-    throw new NotFoundException('Tag not found');
+  try {
+    return tagRepository.findById(id);
+  } catch (err) {
+    throw new NotFoundException('Category not found');
   }
-  return tag;
 };
 
 export const createTag = async (name: string): Promise<Tag> => {
@@ -38,7 +39,12 @@ export const createTag = async (name: string): Promise<Tag> => {
 };
 
 export const deleteById = async (id: string): Promise<void> => {
-  if (!(await tagRepository.existsById(id)))
-    throw new NotFoundException('Tag not found');
-  await tagRepository.deleteById(id);
+  try {
+    return tagRepository.deleteById(id);
+  } catch (err) {
+    if (isPrismaError(err, 'P2025')) {
+      throw new NotFoundException('Tag not found');
+    }
+    throw err;
+  }
 };

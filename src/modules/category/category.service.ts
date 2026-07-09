@@ -2,12 +2,12 @@ import { Category, Prisma } from '@prisma/client';
 import * as categoryRepository from './category.repository';
 import { ConflictException } from '@/common/errors/ConflictException';
 import { NotFoundException } from '@/common/errors/NotFoundException';
-import { Pageable, PageResponse } from '@/common/types/entities';
+import { Pageable } from '@/common/types/entities';
+import { DuplicateResourceException } from '@/common/errors/DuplicateResourceException';
+import { isPrismaError } from '@/common/utils/isPrismaError';
 
-export const findAll = async (
-  pageable: Pageable,
-): Promise<PageResponse<Category>> => {
-  return await categoryRepository.findAll(pageable);
+export const findAll = async (pageable: Pageable) => {
+  return categoryRepository.findAll(pageable);
 };
 
 export const findById = async (id: string): Promise<Category> => {
@@ -18,13 +18,9 @@ export const findById = async (id: string): Promise<Category> => {
 
 export const createCategory = async (name: string): Promise<Category> => {
   try {
-    const category = await categoryRepository.createCategory(name);
-    return category;
+    return categoryRepository.createCategory(name);
   } catch (err) {
-    if (
-      err instanceof Prisma.PrismaClientKnownRequestError &&
-      err.code === 'P2002'
-    ) {
+    if (isPrismaError(err, 'P2002')) {
       const target = err.meta?.target;
       if (Array.isArray(target) && target.includes('name')) {
         throw new ConflictException('This category name is already taken ');
@@ -38,16 +34,38 @@ export const updateCategoryById = async (
   id: string,
   name: string,
 ): Promise<Category> => {
-  if (await categoryRepository.existsByNameExcludeId(name, id)) {
-    throw new ConflictException(`${name} category already exists`);
+  try {
+    const category = await categoryRepository.updateCategoryById(id, name);
+    return category;
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      const target = err.meta?.target;
+      if (Array.isArray(target) && target.includes('name')) {
+        throw new DuplicateResourceException('Category', 'name');
+      }
+    } else if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2025'
+    ) {
+      throw new NotFoundException('Category not found');
+    }
+    throw err;
   }
-  const category = await categoryRepository.updateCategoryById(id, name);
-  return category;
 };
 
 export const deleteCategoryById = async (id: string): Promise<void> => {
-  if (!(await categoryRepository.existsById(id)))
-    throw new NotFoundException('Category not found');
-
-  await categoryRepository.deleteById(id);
+  try {
+    await categoryRepository.deleteById(id);
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2025'
+    ) {
+      throw new NotFoundException('Category not found');
+    }
+    throw err;
+  }
 };

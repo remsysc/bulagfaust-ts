@@ -20,8 +20,8 @@ export const findAll = async (
   return buildPageResponse(tags, pageable, total);
 };
 
-export const findById = async (id: string): Promise<Tag | null> => {
-  return await prisma.tag.findUnique({ where: { id } });
+export const findById = async (id: string): Promise<Tag> => {
+  return await prisma.tag.findUniqueOrThrow({ where: { id } });
 };
 
 export const createTag = async (name: string): Promise<Tag> => {

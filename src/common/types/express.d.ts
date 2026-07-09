@@ -4,7 +4,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: JWTPayload;
-      pageable?: Pageable;
+      pageable: Pageable;
     }
   }
 }

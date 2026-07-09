@@ -9,23 +9,9 @@ export const errorHandler: ErrorRequestHandler = (
   next: NextFunction,
 ) => {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    if (err.code === 'P2002') {
-      const target = err.meta?.target;
-
-      if (Array.isArray(target) && target.includes('email')) {
-        return res.status(409).json({
-          message: `An account with this email already exists.`,
-        });
-      }
-      if (Array.isArray(target) && target.includes('username')) {
-        return res.status(409).json({
-          message: `This username is already taken.`,
-        });
-      }
-      return res.status(409).json({
-        message: `Unique constraint violated`,
-      });
-    }
+    return res.status(409).json({
+      message: `Unique constraint violated`,
+    });
   }
 
   if (err instanceof AppError) {

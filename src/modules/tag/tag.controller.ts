@@ -3,10 +3,6 @@ import * as tagService from './tag.service';
 
 export const getTags: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.pageable) {
-      res.status(500).json({ message: 'Pagination middleware missing' });
-      return;
-    }
     const tags = await tagService.findAll(req.pageable);
     res.status(200).json({ tags });
   } catch (err) {

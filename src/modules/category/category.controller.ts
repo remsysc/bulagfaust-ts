@@ -8,10 +8,6 @@ export const getCategories: RequestHandler = async (
   next,
 ): Promise<void> => {
   try {
-    if (!req.pageable) {
-      res.status(500).json({ message: 'Pagination middleware missing' });
-      return;
-    }
     const categories = await categoryService.findAll(req.pageable);
     res.status(200).json({
       categories,

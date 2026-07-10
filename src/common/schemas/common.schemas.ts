@@ -48,3 +48,23 @@ export const usePaginatedParams = (paramKey: string) => {
       pageable: transformToPageable(data.query),
     }));
 };
+
+const postListQuerySchema = paginationQuerySchema.extend({
+  userId: z.uuid('Invalid userId').optional(),
+  categoryId: z.uuid('Invalid categoryId').optional(),
+  tagId: z.uuid('Invalid tagId').optional(),
+  status: z.string().optional(),
+  search: z.string().optional(),
+});
+
+export const usePostListQuery = () =>
+  z.object({ query: postListQuerySchema }).transform((data) => ({
+    pageable: transformToPageable(data.query),
+    filters: {
+      authorId: data.query.userId,
+      categoryId: data.query.categoryId,
+      tagId: data.query.tagId,
+      status: data.query.status,
+      search: data.query.search,
+    },
+  }));

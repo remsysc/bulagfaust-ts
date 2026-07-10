@@ -5,6 +5,7 @@ import authRoutes from '@/modules/auth/auth.routes';
 import categoryRoutes from '@/modules/category/category.routes';
 import tagRoutes from '@/modules/tag/tag.routes';
 import userRoutes from '@/modules/user/user.routes';
+import postRoutes from '@/modules/post/post.routes';
 import express, { NextFunction, Request, Response } from 'express';
 
 const app = express();
@@ -26,6 +27,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/category', categoryRoutes);
 app.use('/api/v1/tag', tagRoutes);
+app.use('/api/v1/post', postRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const err = new RouteNotFoundException(`Cannot ${req.method} ${req.path}`);

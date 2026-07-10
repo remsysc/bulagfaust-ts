@@ -1,3 +1,4 @@
+import { PostFilters } from '@/modules/post/post.types';
 import { JWTPayload, Pageable } from './entities';
 
 declare global {
@@ -5,6 +6,7 @@ declare global {
     interface Request {
       user?: JWTPayload;
       pageable: Pageable;
+      filters?: PostFilters;
     }
   }
 }

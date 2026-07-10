@@ -395,8 +395,8 @@ declare global {
   - [x] `POST /api/v1/posts` — `requireAuth`
   - [x] `PATCH /api/v1/posts/:id` — `requireAuth` (owner only)
   - [x] `DELETE /api/v1/posts/:id` — `requireAuth` (owner only)
-- [ ] Create `src/routes/post.routes.ts`
-- [ ] Wire into `app.ts`
+- [x] Create `src/routes/post.routes.ts`
+- [x] Wire into `app.ts`
 
 ---
 

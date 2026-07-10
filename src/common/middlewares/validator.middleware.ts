@@ -29,5 +29,8 @@ export const validate =
     if (parsed.data.pageable) {
       (req as any).pageable = parsed.data.pageable;
     }
+    if (parsed.data.filters) {
+      (req as any).filters = parsed.data.filters;
+    }
     next();
   };

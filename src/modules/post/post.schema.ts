@@ -13,6 +13,7 @@ export const createPostSchema = z.object({
   content: z.string().min(10),
   categoryIds: z.array(z.uuid()).optional(),
   tagIds: z.array(z.uuid()).optional(),
+
 });
 
 export const getPostSchema = z.object({

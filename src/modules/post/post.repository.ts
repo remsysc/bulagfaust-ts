@@ -151,9 +151,9 @@ export const updatePost = async (
   });
 };
 
-export const deleteById = async (id: string): Promise<void> => {
+export const deleteById = async (id: string, authorId: string): Promise<void> => {
   await prisma.post.update({
-    where: { id, deletedAt: null },
+    where: { id, deletedAt: null , authorId},
     data: {
       deletedAt: new Date(),
     },

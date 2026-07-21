@@ -1,6 +1,5 @@
 import { Category, Prisma } from '@prisma/client';
 import * as categoryRepository from './category.repository';
-import { ConflictException } from '@/common/errors/ConflictException';
 import { NotFoundException } from '@/common/errors/NotFoundException';
 import { Pageable } from '@/common/types/entities';
 import { DuplicateResourceException } from '@/common/errors/DuplicateResourceException';
@@ -23,7 +22,7 @@ export const createCategory = async (name: string): Promise<Category> => {
     if (isPrismaError(err, 'P2002')) {
       const target = err.meta?.target;
       if (Array.isArray(target) && target.includes('name')) {
-        throw new ConflictException('This category name is already taken ');
+        throw new DuplicateResourceException("Category", 'name');
       }
     }
     throw err;

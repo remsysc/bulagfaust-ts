@@ -25,6 +25,7 @@ router.delete(
   '/:tagId',
   authenticateToken,
   validate(paramsIdSchema('tagId')),
+  requireRole('ROLE_ADMIN'),
   tagController.deleteById,
 );
 

@@ -7,13 +7,15 @@ import tagRoutes from '@/modules/tag/tag.routes';
 import userRoutes from '@/modules/user/user.routes';
 import postRoutes from '@/modules/post/post.routes';
 import express, { NextFunction, Request, Response } from 'express';
+import { config, JWT_SECRET } from '@/config/config';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const secret = process.env.JWT_SECRET;
-if (!secret) throw new Error('JWT_SECRET is not defined');
+const secret = config.JWT_SECRET;
+
 
 prisma.$connect().then(() => console.log('Database connected'));
+
 
 // Parse incoming JSON bodies
 app.use(express.json());
@@ -41,3 +43,5 @@ app.listen(PORT, () => {
 
 //TODO: REWRITE ALL SCHEMA VALIDATOR SERVICES to use prisma specific, create a utility helper for try catch for service
 //TODO: FIX EXCEPTIONS NAMING AND USE A GENERIC CLASS AND GIVE IT A STRUCTURE,
+// TODO:  FIX the ownership of public posts, ie  a unauthorized user can only see the public / published post of  a user
+// while the owner can view all the posts

@@ -3,8 +3,9 @@ import * as postRepository from './post.repository';
 import { CreatePostInput, UpdatePostInput } from './post.schema';
 import { isPrismaError } from '@/common/utils/isPrismaError';
 import { NotFoundException } from '@/common/errors/NotFoundException';
+import { ForbiddenException } from '@/common/errors/ForbiddenException';
 import { Pageable } from '@/common/types/entities';
-import { PostFilters } from './post.types';
+import { PostFilters, PostWithRelations } from './post.types';
 import prisma from '@/common/db/prisma';
 
 export const createPost = async (
@@ -38,4 +39,26 @@ export const deletePostById = async (postId: string, authorId:string) => {
 
 export const getAllPosts = async (pageable: Pageable, filters: PostFilters) => {
   return await postRepository.findAll({ pageable, filters });
+};
+
+/**
+ * Fetch a single post by ID applying visibility rules:
+ * - Published posts are visible to everyone.
+ * - Non-published posts (drafts, etc.) are only visible to their author.
+ */
+export const getPostById = async (
+  postId: string,
+  requestingUserId?: string,
+): Promise<PostWithRelations> => {
+  const post = await postRepository.findByIdWithRelations(postId);
+
+  if (!post) {
+    throw new NotFoundException('Post not found');
+  }
+
+  if (post.status !== 'published' && post.authorId !== requestingUserId) {
+    throw new NotFoundException('Post not found');
+  }
+
+  return post;
 };
